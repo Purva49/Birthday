@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy Birthday, My Love! ✨</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Global Reset & Modern Dark Theme */
+    :root {
+      --bg-dark: #0a0a12;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --accent-pink: #ff2a6d;
+      --accent-glow: #ff758c;
+      --text-main: #f0f0f5;
+      --text-muted: #a0a0b5;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Background Canvas Animation */
+    #particle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Main Container */
+    .app-container {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px 80px 20px;
+    }
+
+    /* Glassmorphism Styling */
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 35px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .glass-card:hover {
+      border-color: rgba(255, 42, 109, 0.4);
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 8px 18px;
+      background: rgba(255, 42, 109, 0.15);
+      border: 1px solid var(--accent-pink);
+      border-radius: 30px;
+      color: var(--accent-glow);
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 0%, #ff758c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 15px;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Secret Letter Reveal Section */
+    .letter-section {
+      text-align: center;
+    }
+
+    .interactive-heart-btn {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff2a6d, #ff758c);
+      border: none;
+      color: #fff;
+      font-size: 2.2rem;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(255, 42, 109, 0.6);
+      transition: all 0.3s ease;
+      margin: 20px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .interactive-heart-btn:hover {
+      transform: scale(1.15) rotate(10deg);
+      box-shadow: 0 0 40px rgba(255, 42, 109, 0.9);
+    }
+
+    .hidden-letter {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      text-align: left;
+      line-height: 1.8;
+      font-size: 1.05rem;
+      color: #e0e0e0;
+      margin-top: 20px;
+      padding: 0 10px;
+    }
+
+    .hidden-letter.open {
+      max-height: 600px;
+      opacity: 1;
+      padding-top: 20px;
+    }
+
+    /* Section Titles */
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: #fff;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    /* Memories Polaroid Gallery */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .polaroid {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--card-border);
+      padding: 12px 12px 20px 12px;
+      border-radius: 16px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .polaroid:hover {
+      transform: translateY(-8px) rotate(1deg);
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--accent-pink);
+    }
+
+    .polaroid-img-placeholder {
+      width: 100%;
+      height: 200px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    .polaroid img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .polaroid-caption {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* Redeemable Coupons Grid */
+    .coupons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .coupon-card {
+      background: linear-gradient(135deg, rgba(255, 42, 109, 0.1) 0%, rgba(255, 255, 255, 0.03) 100%);
+      border: 1px dashed var(--accent-pink);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .coupon-card h4 {
+      font-size: 1.2rem;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .coupon-card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 15px;
+    }
+
+    .redeem-btn {
+      background: transparent;
+      border: 1px solid var(--accent-pink);
+      color: var(--accent-glow);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .redeem-btn:hover {
+      background: var(--accent-pink);
+      color: #fff;
+    }
+
+    .redeem-btn:disabled {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: transparent;
+      color: #777;
+      cursor: not-allowed;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 40px;
+    }
+
+    footer span {
+      color: var(--accent-pink);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Animated Floating Particle Background -->
+  <canvas id="particle-canvas"></canvas>
+
+  <div class="app-container">
+
+    <!-- Hero Header -->
+    <header class="hero glass-card">
+      <span class="hero-badge">Just a sweet little surprise for you. ☁️</span>
+      <h1>Happy Birthday, Sweetheart!</h1>
+      <p class="subtitle">Just a quiet little reminder of how much you mean to me every single day. ✨</p>
+    </header>
+
+    <!-- Interactive Heart & Birthday Note -->
+    <section class="glass-card letter-section">
+      <h2 class="section-title">Tap to Unlock Secret Letter</h2>
+      <button class="interactive-heart-btn" id="heartBtn" onclick="toggleLetter()">💖</button>
+      
+      <div class="hidden-letter" id="secretLetter">
+        <p><strong>To My Favorite Person,</strong></p><br>
+        <p>Happy Birthday, Akkudi! ✨ I wanted to make something special for you today just to remind you how much you mean to me. Thank you for being my comfort person, my best friend, and the one who always makes life a whole lot sweeter. I hope this year brings you everything you’ve been wishing for. Enjoy your day to the fullest—you deserve the best! 💕</p><br>
+      </div>
+    </section>
+
+    <!-- Photo Memory Gallery -->
+    <section class="glass-card">
+      <h2 class="section-title">Our Memory Snapshots 📸</h2>
+      <div class="gallery-grid">
+        <div class="polaroid">
+          <div class="polaroid-img-placeholder">
+            <img src="img1.jpeg" alt="New views with you">
+          </div>
+          <div class="polaroid-caption">New views with you</div>
+        </div>
+        <div class="polaroid">
+          <div class="polaroid-img-placeholder">
+            <img src="img2.jpeg" alt="Soft & Silly Moments">
+          </div>
+          <div class="polaroid-caption">Soft & Silly Moments</div>
+        </div>
+        <div class="polaroid">
+          <div class="polaroid-img-placeholder">
+            <img src="img3.jpeg" alt="Endless Smiles">
+          </div>
+          <div class="polaroid-caption">Endless Smiles</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Love Coupons -->
+    <section class="glass-card">
+      <h2 class="section-title">Your Birthday Vouchers 🎟️</h2>
+      <div class="coupons-grid">
+        <div class="coupon-card">
+          <h4>You Win Every Argument Pass 👑</h4>
+          <p>Valid for 24 hours. No questions asked!</p>
+          <button class="redeem-btn" onclick="redeemCoupon(this)">Claim Voucher</button>
+        </div>
+        <div class="coupon-card">
+          <h4>Favorite Homemade Meal 🍕</h4>
+          <p>I cook or order whatever you crave most!</p>
+          <button class="redeem-btn" onclick="redeemCoupon(this)">Claim Voucher</button>
+        </div>
+        <div class="coupon-card">
+          <h4>Endless Hugs 🧸</h4>
+          <p>Redeemable anytime for unlimited cozy hugs.</p>
+          <button class="redeem-btn" onclick="redeemCoupon(this)">Claim Voucher</button>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>Loveeee youuuuu soooooooooo muchhhhhhh <span>❤️</span></p>
+    </footer>
+
+  </div>
+
+  <script>
+    // Particle Canvas Background Animation
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + 20;
+        this.size = Math.random() * 4 + 2;
+        this.speedY = Math.random() * 1.5 + 0.5;
+        this.opacity = Math.random() * 0.5 + 0.3;
+      }
+      update() {
+        this.y -= this.speedY;
+        if (this.y < -10) this.reset();
+      }
+      draw() {
+        ctx.fillStyle = `rgba(255, 117, 140, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 40; i++) {
+      particles.push(new Particle());
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Toggle Secret Birthday Letter
+    function toggleLetter() {
+      const letter = document.getElementById('secretLetter');
+      const heartBtn = document.getElementById('heartBtn');
+      letter.classList.toggle('open');
+      if (letter.classList.contains('open')) {
+        heartBtn.style.transform = "scale(0.9) rotate(0deg)";
+      }
+    }
+
+    // Coupon Redeem Handler
+    function redeemCoupon(button) {
+      button.innerText = "Claimed! ❤️";
+      button.disabled = true;
+    }
+  </script>
+</body>
+</html>
